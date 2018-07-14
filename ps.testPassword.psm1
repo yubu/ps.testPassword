@@ -32,13 +32,13 @@ function Get-hashcatBench {
 		if (!($online -or $path)) {Write-Host "`nERROR: Missing parameters.`n" -f red; sleep 2; Get-Help -ex $PSCmdlet.MyInvocation.MyCommand.Name; return}
 		
 		if ($bcrypt) {
-			if ($online) {$doc=((iwr "https://gist.githubusercontent.com/epixoip/9d9b943fd580ff6bfa80e48a0e77520d/raw/b3c5bc087e8d573834ce438e1e8cbe7a2f72007f/bcrypt.md").content).split("`n")}
+			if ($online) {$doc=((Invoke-WebRequest -UseBasicParsing "https://gist.githubusercontent.com/epixoip/9d9b943fd580ff6bfa80e48a0e77520d/raw/b3c5bc087e8d573834ce438e1e8cbe7a2f72007f/bcrypt.md").content).split("`n")}
 			elseif ($path) {$doc=gc $path} 
 			$res1=$doc | Select-String "hashtype|speed|device" | ConvertFrom-String -Delimiter ":"
 			if (!$raw) {$res1} else {$doc}
 		}
 		if ($GTX8x1080Ti) {
-			if ($online) {$doc=((iwr "https://gist.githubusercontent.com/epixoip/ace60d09981be09544fdd35005051505/raw/852687e247a02e05bdbcc57f51fd9604a642bfd0/8x1080Ti.md").content).split("`n")}
+			if ($online) {$doc=((Invoke-WebRequest -UseBasicParsing "https://gist.githubusercontent.com/epixoip/ace60d09981be09544fdd35005051505/raw/852687e247a02e05bdbcc57f51fd9604a642bfd0/8x1080Ti.md").content).split("`n")}
 			elseif ($path) {$doc=gc $path}
 			$res1=($doc).trim(" ") | Select-String "#[1-8]." -NotMatch | Select-String "Hashtype|Speed" | ConvertFrom-String -Delimiter ":"
 			if (!$raw) {$res1 | %{$i=0; if ($props) {$props.clear()}}{ $count=$i%(($res1.p1 | select -Unique).count); $props+=@{$($res1.p1 | select -Unique)[$count]=$_.p2}; if ($count -eq (($res1.p1 | select -Unique).count)-1) {New-Object -TypeName PSObject -Property $Props; $props.clear()}; $i++ }}
@@ -81,7 +81,7 @@ function Test-Password {
 	process {
 		if ($PSVersionTable.PSEdition -eq "core") {Write-Host "`nCan't run on Powershell Core. Use Windows Powershell instead.`n" -f red; return}
 		if (!$psboundparameters.count) {Get-Help -ex $PSCmdlet.MyInvocation.MyCommand.Name; return}
-		if ($HIBP -and !(get-module pscx)) {write-host "`nERROR: HIBP query needs pcsx module from the Gallery: install-module pscx -AllowClobber -confirm:$false.`n" -f red; return}
+		if ($HIBP -and !(Get-Module pscx)) {Write-Host "`nERROR: HIBP query needs pcsx module from the Gallery: install-module pscx -AllowClobber -confirm:$false.`n" -f red; return}
 
 		$passComplexity=0
 		$lowerCaseComplexity=26
@@ -106,7 +106,7 @@ function Test-Password {
 		$passSHA1=$hash=($pass | get-hash -Algorithm sha1 -StringEncoding utf8).HashString
 		$query=$hash[0..4] -join ""
 		if ($HIBP) {
-			$result=(Invoke-RestMethod "https://api.pwnedpasswords.com/range/$query").Split("`n") | Select-String $($hash[5..1kb] -join "") | Convertfrom-String -delimiter ":" | select @{n='Hash';e={$_.P1}},@{n='Occurence';e={$_.P2}}
+			$result=(Invoke-RestMethod "https://api.pwnedpasswords.com/range/$query").Split("`n") | Select-String $($hash[5..1kb] -join "") | ConvertFrom-String -delimiter ":" | select @{n='Hash';e={$_.P1}},@{n='Occurence';e={$_.P2}}
 			if ($result) {$passOccurence=$result.Occurence} else {$passOccurence="Not found in HIBP"}
 		}
 		Get-hashcatBench -GTX8x1080Ti -online | select 'Speed.Dev.#*.....',@{n='Speed';e={if ($_.'Speed.Dev.#*.....' -match "kH/s"){[long]([float](($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])*1000)} elseif ($_.'Speed.Dev.#*.....' -match "MH/s"){[long]([float](($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])*1000000)} elseif ($_.'Speed.Dev.#*.....' -match "GH/s"){[long]([float](($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])*1000000000)} else {(($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])}}},Hashtype,@{n='Variants';e={$variantsToCrack}} | select Variants,@{n='Speed.Dev';e={$_.'Speed.Dev.#*.....'}},speed,@{n='SecToCrack';e={[math]::round($_.variants/$_.speed,0)}},hashtype,@{n='CountInHIBP';e={$passOccurence}},@{n='Pass';e={$pass}},@{n='PassSHA1';e={$passSHA1}}
