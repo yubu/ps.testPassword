@@ -21,7 +21,7 @@ Powershell Module to Test the Password Strength
 - Queries Troy's [HIBP](<https://haveibeenpwned.com/Passwords>) password database
 - Prints benchmark table based on Jeremi's [8 x Nvidia GTX 1080 Ti Hashcat Benchmarks](<https://gist.github.com/epixoip/ace60d09981be09544fdd35005051505>)  
 
-### Prerequisits
+### Prerequisites
 - Module PCSX 
 ```powershell
 Install-Module pscx -AllowClobber

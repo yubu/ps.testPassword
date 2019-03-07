@@ -106,9 +106,9 @@ function Test-Password {
 		$passSHA1=$hash=($pass | get-hash -Algorithm sha1 -StringEncoding utf8).HashString
 		$query=$hash[0..4] -join ""
 		if ($HIBP) {
-			$result=(Invoke-RestMethod "https://api.pwnedpasswords.com/range/$query").Split("`n") | Select-String $($hash[5..1kb] -join "") | ConvertFrom-String -delimiter ":" | select @{n='Hash';e={$_.P1}},@{n='Occurence';e={$_.P2}}
-			if ($result) {$passOccurence=$result.Occurence} else {$passOccurence="Not found in HIBP"}
+			$result=(Invoke-RestMethod "https://api.pwnedpasswords.com/range/$query").Split("`n") | Select-String $($hash[5..1kb] -join "") | ConvertFrom-String -delimiter ":" | select @{n='Hash';e={$_.P1}},@{n='Occurrence';e={$_.P2}}
+			if ($result) {$passOccurrence=$result.Occurrence} else {$passOccurrence="Not found in HIBP"}
 		}
-		Get-hashcatBench -GTX8x1080Ti -online | select 'Speed.Dev.#*.....',@{n='Speed';e={if ($_.'Speed.Dev.#*.....' -match "kH/s"){[long]([float](($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])*1000)} elseif ($_.'Speed.Dev.#*.....' -match "MH/s"){[long]([float](($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])*1000000)} elseif ($_.'Speed.Dev.#*.....' -match "GH/s"){[long]([float](($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])*1000000000)} else {(($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])}}},Hashtype,@{n='Variants';e={$variantsToCrack}} | select Variants,@{n='Speed.Dev';e={$_.'Speed.Dev.#*.....'}},speed,@{n='SecToCrack';e={[math]::round($_.variants/$_.speed,0)}},hashtype,@{n='CountInHIBP';e={$passOccurence}},@{n='Pass';e={$pass}},@{n='PassSHA1';e={$passSHA1}}
+		Get-hashcatBench -GTX8x1080Ti -online | select 'Speed.Dev.#*.....',@{n='Speed';e={if ($_.'Speed.Dev.#*.....' -match "kH/s"){[long]([float](($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])*1000)} elseif ($_.'Speed.Dev.#*.....' -match "MH/s"){[long]([float](($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])*1000000)} elseif ($_.'Speed.Dev.#*.....' -match "GH/s"){[long]([float](($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])*1000000000)} else {(($_.'Speed.Dev.#*.....').trim(" ").split(" ")[0])}}},Hashtype,@{n='Variants';e={$variantsToCrack}} | select Variants,@{n='Speed.Dev';e={$_.'Speed.Dev.#*.....'}},speed,@{n='SecToCrack';e={[math]::round($_.variants/$_.speed,0)}},hashtype,@{n='CountInHIBP';e={$passOccurrence}},@{n='Pass';e={$pass}},@{n='PassSHA1';e={$passSHA1}}
 	}
 }
