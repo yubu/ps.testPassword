@@ -131,4 +131,3 @@ Total password variants for brute force: 308915776
 - bach 2107 times
 - beethoven 16103 times
 - ...
-
