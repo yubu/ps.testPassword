@@ -7,6 +7,7 @@ Powershell Module to Test the Password Strength
 - My favorite sources in this regard were Jeff Atwood's [post](<https://blog.codinghorror.com/hacker-hack-thyself/>) from about year ago and a bit outdated ["Estimating Password Cracking Times"](<https://www.betterbuys.com/estimating-password-cracking-times/>)  
 - Jeff pointed to Jeremi M Gosney's [Github gists](<https://gist.github.com/epixoip>) with hashcat benchmarks running on various hardware configurations  
 - The most interesting was the [8 x Nvidia GTX 1080 Ti Hashcat Benchmarks](<https://gist.github.com/epixoip/ace60d09981be09544fdd35005051505>)
+- Updated results to: [Nvidia RTX 2080 SUPER FE Hashcat Benchmarks](<https://gist.github.com/epixoip/47098d25f171ec1808b519615be1b90d>) 
 - The list of other handful resources I have used:
   - [Introducing 306 Million Freely Downloadable Pwned Passwords](<https://www.troyhunt.com/introducing-306-million-freely-downloadable-pwned-passwords/>)
   - [How Long Does It Take to Crack Your Password?](<https://blog.elcomsoft.com/2017/04/how-long-does-it-take-to-crack-your-password/>)
@@ -14,17 +15,17 @@ Powershell Module to Test the Password Strength
   - [Today I Am Releasing Ten Million Passwords](<https://xato.net/today-i-am-releasing-ten-million-passwords-b6278bbe7495>)
   - [Password strength calculator](<https://projects.lambry.com/elpassword/>)
   - [Calculate Passwords](<https://asecuritysite.com/encryption/passes>)
+  - [Your Pa$$word doesn't matter](<https://techcommunity.microsoft.com/t5/Azure-Active-Directory-Identity/Your-Pa-word-doesn-t-matter/ba-p/731984>)
 - I'm sure there are much more...
 
 ### What module does
 - Tests the password strength
 - Queries Troy's [HIBP](<https://haveibeenpwned.com/Passwords>) password database
-- Prints benchmark table based on Jeremi's [8 x Nvidia GTX 1080 Ti Hashcat Benchmarks](<https://gist.github.com/epixoip/ace60d09981be09544fdd35005051505>)  
+- Prints benchmark table based on Jeremi's [8 x Nvidia GTX 1080 Ti Hashcat Benchmarks](<https://gist.github.com/epixoip/ace60d09981be09544fdd35005051505>) 
+- Prints benchmark table based on Jeremi's [Nvidia RTX 2080 SUPER FE Hashcat Benchmarks](<https://gist.github.com/epixoip/47098d25f171ec1808b519615be1b90d>) 
 
 ### Prerequisites
-- Module PCSX 
-```powershell
-Install-Module pscx -AllowClobber
+- None
 ```
 
 ### Installation from Github
@@ -54,8 +55,12 @@ help -ex Test-Password
 
 ##### Examples
 ```powershell
+Get-hashcatBench -RTX1x2080S -online | ft -a                # Get stats for 1 x RTX202Super FE nVidia card
+Get-hashcatBench -GTX8x1080Ti -online | ft -a               # Get stats for Sagitta Brutalis 1080 Ti (SKU N4X48-GTX1080TI-2620-128-2X500) with 8 x -GTX1080Ti nVidia Cards
+Get-hashcatBench -GTX8x1080Ti -online -raw                  # Get detailed stats as is from Github for Sagitta Brutalis 1080 Ti (SKU N4X48-GTX1080TI-2620-128-2X500) with 8 x -GTX1080Ti nVidia Cards
 Test-Password qwerty                # Test "qwerty" password strength
 Test-Password qwerty -HIBP          # Test "qwerty" password strength and query the HIBP DB
+Test-Password -HIBPListBreaches | ft -a    # Get list of all security breaches from HIBP site
 Test-Password qwerty -HIBP | ? Hashtype -match Office | sort SecToCrack | ft -a
 Test-Password qwerty -HIBP | ? Hashtype -match PBKDF2 | sort SecToCrack | ft -a
 gc c:\passlist.txt | ? {$_} | tpass -HIBP | ? Hashtype -match pbkdf2 | sort SecToCrack,Pass | ft -a
