@@ -98,9 +98,6 @@ function Remove-EmptyLines {
 					@{n="Speed";e={if ($_.rate -eq  "H/s") {$_.speeddev} elseif ($_.rate -eq  'kH/s') {$_.speeddev*1000} elseif  ($_.rate -eq 'MH/s') {$_.speeddev*1000000} elseif ($_.rate -eq  'GH/s') {$_.speeddev*1000000000}}}
 					"hash"
 				)
-				# @{n="Speed";e={if ($_.rate -eq  "H/s") {$_.speeddev} elseif ($_.rate -eq  'kH/s') {$_.speeddev*1000} elseif  ($_.rate -eq 'MH/s') {$_.speeddev*1000000} elseif ($_.rate -eq  'GH/s') {$_.speeddev*1000000000}}}
-				# $table | select @{n='SpeedDev';e={[int64]($_.'Speed.Dev.#*.....'.trim() -split " ")[0]}},Hashtype
-				# $table | select -Property $selectProps | select SpeedDev,Rate,@{n="Speed";e={if ($_.rate -eq  "H/s") {$_.speeddev} elseif ($_.rate -eq  'kH/s') {$_.speeddev*1000} elseif  ($_.rate -eq 'MH/s') {$_.speeddev*1000000} elseif ($_.rate -eq  'GH/s') {$_.speeddev*1000000000}}},hash
 				$table | select -Property $selectProps | select -Property $selectProps1
 			}
 			else {$doc}
@@ -128,7 +125,6 @@ function Remove-EmptyLines {
 					"Hash"
 					"Details"
 				)
-				# $table | select @{n='SpeedDev';e={[int64]($_.speed -split " ")[0]}},@{n="Rate";e={($_.speed -split " ")[1]}},hash,@{n="Desc";e={($_.speed -split " ")[2..6] -join " "}} | select SpeedDev,Rate,@{n="Speed";e={if ($_.rate -eq  "H/s") {$_.speeddev} elseif ($_.rate -eq  'kH/s') {$_.speeddev*1000} elseif  ($_.rate -eq 'MH/s') {$_.speeddev*1000000} elseif ($_.rate -eq  'GH/s') {$_.speeddev*1000000000}}},hash,desc | ft -a
 				$table | select -Property $selectProps | select -Property $selectProps1
 
 			}
